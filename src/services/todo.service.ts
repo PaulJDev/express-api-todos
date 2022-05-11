@@ -1,7 +1,19 @@
 import axios from 'axios'
-import type { Todo } from '../types/todo.type'
+import { Todo, TodoWhitoutSensitiveData } from '../types/todo.type'
 
-export const getTodos = async (): Promise<Todo[]> => {
-    const { data } = await axios.get('https://jsonplaceholder.typicode.com/todos')
-    return data.slice(0, 25)
+const URL = process.env.URL as string
+
+export const getTodos = async (): Promise<TodoWhitoutSensitiveData[]> => {
+    const { data } = await axios.get(URL)
+    return data.map((todo: Todo)  => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { userId, ...rest } = todo
+        return rest
+    })
 }
+
+export const getTodoById = async (id: number): Promise<Todo | null> => {
+    const { data } = await axios.get(URL)
+    return data.find(({ id: todoId }: Pick<Todo, 'id'>) => todoId === id)
+}
+
